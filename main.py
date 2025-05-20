@@ -1,16 +1,8 @@
 import os
 import pygame
 
-# Set up framebuffer video driver BEFORE initializing pygame
-os.putenv('SDL_VIDEODRIVER', 'fbcon')
-os.putenv('SDL_FBDEV', '/dev/fb0')
-os.putenv('SDL_NOMOUSE', '0')
 
-# Now initialize Pygame
-pygame.display.init()
-pygame.font.init()
-
-# Create screen (fallback resolution)
+pygame.init()
 screen = pygame.display.set_mode((800, 480))
 pygame.mouse.set_visible(True)
 
