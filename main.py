@@ -78,14 +78,14 @@ def draw_mustang(surface, center, angle):
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
-angle = 0
+angle = 190
 running = True
 while running:
     screen.fill(BLACK)
 
     # Draw the rotating Mustang
     draw_mustang(screen, center=(600, 240), angle=angle)
-    angle = (angle + 0.5) % 360
+    angle = (angle + 10) % 360
 
     # Draw UI buttons
     for button in buttons:
