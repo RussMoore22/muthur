@@ -51,22 +51,30 @@ def draw_mustang(surface, center, angle):
     # Normalize angle to 0–359
     normalized = int(angle) % 360
 
-    # Round angle to nearest multiple of 45 (or 30, 22.5 for smoother rotation)
+    # Round angle to nearest multiple of 45
     frame_angle = round(normalized / 45) * 45
     frame_path = f"/home/rcmoore/muthur/sprites/mustang_{frame_angle:03}.png"
 
-    # Load and cache the image
     if not os.path.exists(frame_path):
         logging.warning(f"Sprite not found: {frame_path}")
         return
 
     image = pygame.image.load(frame_path).convert_alpha()
 
-    # Flip if facing backward
-    if 180 <= normalized < 360:
+    # Flip if necessary
+    flip = 180 <= normalized < 360
+    if flip:
         image = pygame.transform.flip(image, True, False)
 
-    # Center image on screen
+    # Scale the image to fit within 300x200
+    max_width, max_height = 300, 200
+    original_width, original_height = image.get_size()
+
+    scale = min(max_width / original_width, max_height / original_height, 1.0)
+    new_size = (int(original_width * scale), int(original_height * scale))
+    image = pygame.transform.smoothscale(image, new_size)
+
+    # Re-center after scaling (and flipping)
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
