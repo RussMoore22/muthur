@@ -46,12 +46,16 @@ buttons = [
 ]
 
 def draw_mustang(surface, center, angle):
+    unflip = True
+    if angle > 180:
+        angle -= 90
+        flip = False
     cx, cy = center
 
     # Normalize angle to 0–359
     normalized = int(angle) % 360
 
-    # Round angle to nearest multiple of 45
+    # Round angle to nearest multiple of 45 (or 30, 22.5 for smoother rotation)
     frame_angle = round(normalized / 45) * 45
     frame_path = f"/home/rcmoore/muthur/sprites/mustang_{frame_angle:03}.png"
 
@@ -59,12 +63,7 @@ def draw_mustang(surface, center, angle):
         logging.warning(f"Sprite not found: {frame_path}")
         return
 
-    image = pygame.image.load(frame_path).convert_alpha()
-
-    # Flip if necessary
-    flip = 180 <= normalized < 360
-    if flip:
-        image = pygame.transform.flip(image, True, False)
+    image = pygame.image.load(frame_path).convert_alpha() if unflip else pygame.transform.flip(image, True, False)
 
     # Scale the image to fit within 300x200
     max_width, max_height = 300, 200
@@ -78,14 +77,14 @@ def draw_mustang(surface, center, angle):
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
-angle = 190
+angle = 180
 running = True
 while running:
     screen.fill(BLACK)
 
     # Draw the rotating Mustang
     draw_mustang(screen, center=(600, 240), angle=angle)
-    angle = (angle + 10) % 360
+    angle = (angle + 22.5) % 360
 
     # Draw UI buttons
     for button in buttons:
