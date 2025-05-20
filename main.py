@@ -1,5 +1,6 @@
 import pygame
 import math
+import os
 
 pygame.init()
 screen = pygame.display.set_mode((800, 480))
@@ -35,44 +36,30 @@ buttons = [
     Button(50, 260, 250, 60, "SELF DESTRUCT"),
 ]
 
-# Simulated "3D" projection of car points rotating around Z axis
-def draw_mustang(surface, center, size, angle):
+def draw_mustang(surface, center, angle):
     cx, cy = center
 
-    # Base polygon car shape (simple 8-point outline)
-    car_points = [
-        (-2, -1), (-1.5, -1.2), (1.5, -1.2), (2, -1),
-        (2, 1), (1.5, 1.2), (-1.5, 1.2), (-2, 1)
-    ]
+    # Normalize angle to 0–359
+    normalized = int(angle) % 360
 
-    # Wheel anchor positions (before rotation)
-    wheel_points = [
-        (-1.6, 1.3),  # rear
-        (1.6, 1.3)    # front
-    ]
+    # Round angle to nearest multiple of 45 (or 30, 22.5 for smoother rotation)
+    frame_angle = round(normalized / 45) * 45
+    frame_path = f"/home/pi/muthur/sprites/mustang_{frame_angle:03}.png"
 
-    rotated_car = []
-    for x, y in car_points:
-        angle_rad = math.radians(angle)
-        z = math.sin(angle_rad) * x
-        scale = 1 + 0.3 * z  # simulate depth
-        x_rot = x * math.cos(angle_rad) - y * math.sin(angle_rad)
-        y_rot = x * math.sin(angle_rad) + y * math.cos(angle_rad)
-        rotated_car.append((cx + x_rot * size * scale, cy + y_rot * size * scale * 0.6))
+    # Load and cache the image
+    if not os.path.exists(frame_path):
+        print(f"[Warning] Sprite not found: {frame_path}")
+        return
 
-    pygame.draw.polygon(surface, NEON_GREEN, rotated_car, 2)
+    image = pygame.image.load(frame_path).convert_alpha()
 
-    # Draw wheels with same transformation logic
-    for wx, wy in wheel_points:
-        angle_rad = math.radians(angle)
-        z = math.sin(angle_rad) * wx
-        scale = 1 + 0.3 * z
-        x_rot = wx * math.cos(angle_rad) - wy * math.sin(angle_rad)
-        y_rot = wx * math.sin(angle_rad) + wy * math.cos(angle_rad)
-        px = cx + x_rot * size * scale
-        py = cy + y_rot * size * scale * 0.6
-        wheel_radius = 10 * scale
-        pygame.draw.circle(surface, NEON_GREEN, (int(px), int(py)), int(wheel_radius), 2)
+    # Flip if facing backward
+    if 180 <= normalized < 360:
+        image = pygame.transform.flip(image, True, False)
+
+    # Center image on screen
+    image_rect = image.get_rect(center=(cx, cy))
+    surface.blit(image, image_rect)
 
 angle = 0
 running = True
