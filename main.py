@@ -38,22 +38,41 @@ buttons = [
 # Simulated "3D" projection of car points rotating around Z axis
 def draw_mustang(surface, center, size, angle):
     cx, cy = center
+
+    # Base polygon car shape (simple 8-point outline)
     car_points = [
         (-2, -1), (-1.5, -1.2), (1.5, -1.2), (2, -1),
         (2, 1), (1.5, 1.2), (-1.5, 1.2), (-2, 1)
     ]
 
-    rotated_points = []
+    # Wheel anchor positions (before rotation)
+    wheel_points = [
+        (-1.6, 1.3),  # rear
+        (1.6, 1.3)    # front
+    ]
+
+    rotated_car = []
     for x, y in car_points:
-        # Simulate 3D perspective rotation
         angle_rad = math.radians(angle)
         z = math.sin(angle_rad) * x
-        scale = 1 + 0.3 * z  # simulate depth scaling
+        scale = 1 + 0.3 * z  # simulate depth
         x_rot = x * math.cos(angle_rad) - y * math.sin(angle_rad)
         y_rot = x * math.sin(angle_rad) + y * math.cos(angle_rad)
-        rotated_points.append((cx + x_rot * size * scale, cy + y_rot * size * scale * 0.6))
+        rotated_car.append((cx + x_rot * size * scale, cy + y_rot * size * scale * 0.6))
 
-    pygame.draw.polygon(surface, NEON_GREEN, rotated_points, 2)
+    pygame.draw.polygon(surface, NEON_GREEN, rotated_car, 2)
+
+    # Draw wheels with same transformation logic
+    for wx, wy in wheel_points:
+        angle_rad = math.radians(angle)
+        z = math.sin(angle_rad) * wx
+        scale = 1 + 0.3 * z
+        x_rot = wx * math.cos(angle_rad) - wy * math.sin(angle_rad)
+        y_rot = wx * math.sin(angle_rad) + wy * math.cos(angle_rad)
+        px = cx + x_rot * size * scale
+        py = cy + y_rot * size * scale * 0.6
+        wheel_radius = 10 * scale
+        pygame.draw.circle(surface, NEON_GREEN, (int(px), int(py)), int(wheel_radius), 2)
 
 angle = 0
 running = True
