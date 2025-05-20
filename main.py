@@ -1,43 +1,40 @@
 import os
 import pygame
 
-# Use the framebuffer directly (if no desktop environment)
+# Set up framebuffer video driver BEFORE initializing pygame
 os.putenv('SDL_VIDEODRIVER', 'fbcon')
 os.putenv('SDL_FBDEV', '/dev/fb0')
+os.putenv('SDL_NOMOUSE', '0')
 
-pygame.init()
+# Now initialize Pygame
+pygame.display.init()
+pygame.font.init()
+
+# Create screen (fallback resolution)
+screen = pygame.display.set_mode((800, 480))
 pygame.mouse.set_visible(True)
 
-# Screen setup (adjust if needed)
-WIDTH, HEIGHT = 800, 480
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
-# Colors
+# Define colors
 BLACK = (0, 0, 0)
 NEON_GREEN = (0, 255, 0)
-DEEP_GREEN = (0, 100, 0)
-WHITE = (255, 255, 255)
+DARK_GREEN = (0, 100, 0)
 
-# Font
-font = pygame.font.SysFont("Courier", 28, bold=True)
+font = pygame.font.SysFont('Courier', 28, bold=True)
 
-# Button class
 class Button:
     def __init__(self, x, y, w, h, label):
         self.rect = pygame.Rect(x, y, w, h)
         self.label = label
 
     def draw(self, surface):
-        pygame.draw.rect(surface, DEEP_GREEN, self.rect, border_radius=6)
-        pygame.draw.rect(surface, NEON_GREEN, self.rect, 2, border_radius=6)
+        pygame.draw.rect(surface, DARK_GREEN, self.rect, border_radius=5)
+        pygame.draw.rect(surface, NEON_GREEN, self.rect, 2, border_radius=5)
         text = font.render(self.label, True, NEON_GREEN)
-        text_rect = text.get_rect(center=self.rect.center)
-        surface.blit(text, text_rect)
+        surface.blit(text, text.get_rect(center=self.rect.center))
 
     def is_pressed(self, pos):
         return self.rect.collidepoint(pos)
 
-# Buttons
 buttons = [
     Button(50, 100, 250, 60, "INITIATE"),
     Button(50, 180, 250, 60, "OVERRIDE"),
