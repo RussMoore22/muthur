@@ -1,6 +1,15 @@
 import pygame
 import math
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(
+    filename="/home/rcmoore/muthur/muthur.log",
+    filemode='a',
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 pygame.init()
 screen = pygame.display.set_mode((800, 480))
@@ -44,11 +53,11 @@ def draw_mustang(surface, center, angle):
 
     # Round angle to nearest multiple of 45 (or 30, 22.5 for smoother rotation)
     frame_angle = round(normalized / 45) * 45
-    frame_path = f"/home/pi/muthur/sprites/mustang_{frame_angle:03}.png"
+    frame_path = f"/home/rcmoore/muthur/sprites/mustang_{frame_angle:03}.png"
 
     # Load and cache the image
     if not os.path.exists(frame_path):
-        print(f"[Warning] Sprite not found: {frame_path}")
+        logging.warning(f"Sprite not found: {frame_path}")
         return
 
     image = pygame.image.load(frame_path).convert_alpha()
@@ -67,7 +76,7 @@ while running:
     screen.fill(BLACK)
 
     # Draw the rotating Mustang
-    draw_mustang(screen, center=(600, 240), size=40, angle=angle)
+    draw_mustang(screen, center=(600, 240), angle=angle)
     angle = (angle + 0.5) % 360
 
     # Draw UI buttons
@@ -81,7 +90,7 @@ while running:
             pos = pygame.mouse.get_pos()
             for button in buttons:
                 if button.is_pressed(pos):
-                    print(f">>> {button.label} PRESSED <<<")
+                    logging.info(f"{button.label} button pressed")
                     if button.label == "SELF DESTRUCT":
                         running = False
 
