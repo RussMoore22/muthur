@@ -46,11 +46,11 @@ buttons = [
 ]
 
 def draw_mustang(surface, center, angle):
-    unflip = True
+    flip = True
     if angle > 180:
         d_angle = angle - 180
         angle -= 2*d_angle
-        unflip = False
+        flip = False
     cx, cy = center
 
     # Normalize angle to 0–359
@@ -64,8 +64,10 @@ def draw_mustang(surface, center, angle):
         logging.warning(f"Sprite not found: {frame_path}")
         return
 
-    image = pygame.image.load(frame_path).convert_alpha() if unflip else pygame.transform.flip(image, True, False)
+    image = pygame.image.load(frame_path).convert_alpha()
 
+    if flip:
+        image = pygame.transform.flip(image, True, False)
     # Scale the image to fit within 300x200
     max_width, max_height = 300, 200
     original_width, original_height = image.get_size()
