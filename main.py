@@ -46,12 +46,17 @@ buttons = [
 ]
 
 def draw_mustang(surface, center, angle):
+    unflip = True
+    if angle > 180:
+        d_angle = angle - 180
+        angle -= 2*d_angle
+        unflip = False
     cx, cy = center
 
     # Normalize angle to 0–359
     normalized = int(angle) % 360
 
-    # Round angle to nearest multiple of 45
+    # Round angle to nearest multiple of 45 (or 30, 22.5 for smoother rotation)
     frame_angle = round(normalized / 45) * 45
     frame_path = f"/home/rcmoore/muthur/sprites/mustang_{frame_angle:03}.png"
 
@@ -59,22 +64,17 @@ def draw_mustang(surface, center, angle):
         logging.warning(f"Sprite not found: {frame_path}")
         return
 
-    logging.info(f"Drawing angle: {normalized} | Sprite: {frame_angle:03} | Flip: {'Yes' if 180 <= normalized < 360 else 'No'}")
+    image = pygame.image.load(frame_path).convert_alpha() if unflip else pygame.transform.flip(image, True, False)
 
-    image = pygame.image.load(frame_path).convert_alpha()
-
-    # Flip image if angle is in rear-facing hemisphere
-    if 180 <= normalized < 360:
-        image = pygame.transform.flip(image, True, False)
-
-    # Scale to no more than 300x200
+    # Scale the image to fit within 300x200
     max_width, max_height = 300, 200
     original_width, original_height = image.get_size()
+
     scale = min(max_width / original_width, max_height / original_height, 1.0)
     new_size = (int(original_width * scale), int(original_height * scale))
     image = pygame.transform.smoothscale(image, new_size)
 
-    # Center and render
+    # Re-center after scaling (and flipping)
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
