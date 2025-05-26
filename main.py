@@ -41,20 +41,20 @@ class Button:
 
 
 
-class Screen:
+class View:
     def __init__(self, name, parent=None, children=None, buttons=None):
         self.name = name
         self.parent = parent
         self.children = children if children else []
         self.buttons = buttons if buttons else []
     
-    def switch_screen(self, name=None, home=False):
+    def switch_view(self, name=None, home=False):
         
         if home == True:
-            screen = self
-            while screen.parent is not None:
-                screen = screen.parent
-            return screen
+            view = self
+            while view.parent is not None:
+                view = view.parent
+            return view
 
         if name == None:
             return self.parent
@@ -64,13 +64,13 @@ class Screen:
                 return child
             
         
-# create screens:
+# create views:
 
-pair_screen = Screen(name="pair_screen")
-analyze_screen = Screen(name="analyze_screen")
-home_screen = Screen(
+pair_view = View(name="pair_view")
+analyze_view = View(name="analyze_view")
+home_view = View(
     name="home",
-    children=[pair_screen, analyze_screen], 
+    children=[pair_view, analyze_view], 
     buttons = [
         Button(50, 100, 250, 60, "INITIATE"),
         Button(50, 180, 250, 60, "OVERRIDE"),
@@ -78,7 +78,7 @@ home_screen = Screen(
     ]
 )
 
-pair_screen.parent = home_screen
+pair_view.parent = home_view
 
 
 def draw_mustang(surface, center, angle):
@@ -116,13 +116,13 @@ def draw_mustang(surface, center, angle):
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
-current_screen = home_screen
+current_view = home_view
 
 angle = 180
 running = True
 while running:
     screen.fill(BLACK)
-    buttons = current_screen.buttons
+    buttons = current_view.buttons
 
     # Draw the rotating Mustang
     draw_mustang(screen, center=(600, 240), angle=angle)
