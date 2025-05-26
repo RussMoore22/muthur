@@ -94,7 +94,7 @@ home_view.buttons = [
 pair_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view)
 ]
-pair_view.buttons = [
+analyze_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view)
 ]
 
