@@ -39,11 +39,47 @@ class Button:
     def is_pressed(self, pos):
         return self.rect.collidepoint(pos)
 
-buttons = [
-    Button(50, 100, 250, 60, "INITIATE"),
-    Button(50, 180, 250, 60, "OVERRIDE"),
-    Button(50, 260, 250, 60, "SELF DESTRUCT"),
-]
+
+
+class Screen:
+    def __init__(self, name, parent=None, children=None, buttons=None):
+        self.name = name
+        self.parent = parent
+        self.children = children if children else []
+        self.buttons = buttons if buttons else []
+    
+    def switch_screen(self, name=None, home=False):
+        
+        if home == True:
+            screen = self
+            while screen.parent is not None:
+                screen = screen.parent
+            return screen
+
+        if name == None:
+            return self.parent
+        
+        for child in self.children:
+            if child.name == name:
+                return child
+            
+        
+# create screens:
+
+pair_screen = Screen(name="pair_screen")
+analyze_screen = Screen(name="analyze_screen")
+home_screen = Screen(
+    name="home",
+    children=[pair_screen, analyze_screen], 
+    buttons = [
+        Button(50, 100, 250, 60, "INITIATE"),
+        Button(50, 180, 250, 60, "OVERRIDE"),
+        Button(50, 260, 250, 60, "SELF DESTRUCT"),
+    ]
+)
+
+pair_screen.parent = home_screen
+
 
 def draw_mustang(surface, center, angle):
     flip = True
@@ -80,10 +116,13 @@ def draw_mustang(surface, center, angle):
     image_rect = image.get_rect(center=(cx, cy))
     surface.blit(image, image_rect)
 
+current_screen = home_screen
+
 angle = 180
 running = True
 while running:
     screen.fill(BLACK)
+    buttons = current_screen.buttons
 
     # Draw the rotating Mustang
     draw_mustang(screen, center=(600, 240), angle=angle)
