@@ -24,20 +24,7 @@ DARK_GREEN = (0, 100, 0)
 
 font = pygame.font.SysFont('Courier', 28, bold=True)
 
-# Button class
-class Button:
-    def __init__(self, x, y, w, h, label):
-        self.rect = pygame.Rect(x, y, w, h)
-        self.label = label
 
-    def draw(self, surface):
-        pygame.draw.rect(surface, DARK_GREEN, self.rect, border_radius=5)
-        pygame.draw.rect(surface, NEON_GREEN, self.rect, 2, border_radius=5)
-        text = font.render(self.label, True, NEON_GREEN)
-        surface.blit(text, text.get_rect(center=self.rect.center))
-
-    def is_pressed(self, pos):
-        return self.rect.collidepoint(pos)
 
 
 
@@ -62,24 +49,39 @@ class View:
         for child in self.children:
             if child.name == name:
                 return child
-            
+# Button class
+class Button:
+    def __init__(self, x, y, w, h, label, redirect: View):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.label = label
+        self.redirect = redirect
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, DARK_GREEN, self.rect, border_radius=5)
+        pygame.draw.rect(surface, NEON_GREEN, self.rect, 2, border_radius=5)
+        text = font.render(self.label, True, NEON_GREEN)
+        surface.blit(text, text.get_rect(center=self.rect.center))
+
+    def is_pressed(self, pos):
+        return self.rect.collidepoint(pos)
         
+
 # create views:
 
 pair_view = View(name="pair_view")
 analyze_view = View(name="analyze_view")
+
 home_view = View(
     name="home",
-    children=[pair_view, analyze_view], 
-    buttons = [
-        Button(50, 100, 250, 60, "INITIATE"),
-        Button(50, 180, 250, 60, "OVERRIDE"),
-        Button(50, 260, 250, 60, "SELF DESTRUCT"),
-    ]
+    children=[pair_view, analyze_view],
 )
+home_view.buttons = [
+        Button(50, 100, 250, 60, "SCAN INFECTION", pair_view),
+        Button(50, 180, 250, 60, "ANALYZE", analyze_view),
+        Button(50, 260, 250, 60, "SELF DESTRUCT", home_view),
+    ]
 
 pair_view.parent = home_view
-
 
 def draw_mustang(surface, center, angle):
     flip = True
@@ -125,8 +127,9 @@ while running:
     buttons = current_view.buttons
 
     # Draw the rotating Mustang
-    draw_mustang(screen, center=(600, 240), angle=angle)
-    angle = (angle + 5) % 360
+    if current_view.name == "home":
+        draw_mustang(screen, center=(600, 240), angle=angle)
+        angle = (angle + 5) % 360
 
     # Draw UI buttons
     for button in buttons:
@@ -140,8 +143,7 @@ while running:
             for button in buttons:
                 if button.is_pressed(pos):
                     logging.info(f"{button.label} button pressed")
-                    if button.label == "SELF DESTRUCT":
-                        running = False
+                    current_view = button.redirect
 
     pygame.display.update()
     clock.tick(60)
