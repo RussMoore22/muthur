@@ -49,6 +49,7 @@ class View:
         for child in self.children:
             if child.name == name:
                 return child
+            
 # Button class
 class Button:
     def __init__(self, x, y, w, h, label, redirect: View):
@@ -64,6 +65,11 @@ class Button:
 
     def is_pressed(self, pos):
         return self.rect.collidepoint(pos)
+    
+    def change_view(self, current_view):
+        if self.label == "SELF DESTRUCT":
+            pygame.quit()
+        return self.redirect
         
 
 # create views:
@@ -75,13 +81,16 @@ home_view = View(
     name="home",
     children=[pair_view, analyze_view],
 )
+
+
+pair_view.parent = home_view
+
 home_view.buttons = [
         Button(50, 100, 250, 60, "SCAN INFECTION", pair_view),
         Button(50, 180, 250, 60, "ANALYZE", analyze_view),
         Button(50, 260, 250, 60, "SELF DESTRUCT", home_view),
     ]
 
-pair_view.parent = home_view
 
 def draw_mustang(surface, center, angle):
     flip = True
