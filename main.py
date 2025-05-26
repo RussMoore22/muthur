@@ -91,6 +91,13 @@ home_view.buttons = [
         Button(50, 260, 250, 60, "SELF DESTRUCT", home_view),
     ]
 
+pair_view.buttons = [
+    Button(50, 100, 250, 60, "ESCAPE", home_view)
+]
+pair_view.buttons = [
+    Button(50, 100, 250, 60, "ESCAPE", home_view)
+]
+
 
 def draw_mustang(surface, center, angle):
     flip = True
