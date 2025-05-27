@@ -8,6 +8,12 @@ import json
 
 bluetooth_agent = None
 bluetooth_log_lines = []
+running = True
+
+
+def self_destruct():
+    global running
+    running = False
 
 # Configure logging
 logging.basicConfig(
@@ -212,6 +218,7 @@ class Button:
         self.action()
         return self.redirect
 
+
         
 # create views:
 pair_view = View(name="pair_view")
@@ -227,7 +234,7 @@ pair_view.parent = home_view
 home_view.buttons = [
         Button(50, 100, 250, 60, "SCAN INFECTION", pair_view),
         Button(50, 180, 250, 60, "ANALYZE", analyze_view),
-        Button(50, 260, 250, 60, "SELF DESTRUCT", home_view),
+        Button(50, 260, 250, 60, "SELF DESTRUCT", home_view, self_destruct),
     ]
 
 pair_view.buttons = [
@@ -277,7 +284,7 @@ def draw_mustang(surface, center, angle):
 current_view = home_view
 
 angle = 180
-running = True
+
 try:
     while running:
         if current_view.name == "pair_view" and bluetooth_agent:
