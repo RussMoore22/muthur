@@ -25,9 +25,6 @@ DARK_GREEN = (0, 100, 0)
 font = pygame.font.SysFont('Courier', 28, bold=True)
 
 
-
-
-
 class View:
     def __init__(self, name, parent=None, children=None, buttons=None):
         self.name = name
@@ -73,7 +70,6 @@ class Button:
         
 
 # create views:
-
 pair_view = View(name="pair_view")
 analyze_view = View(name="analyze_view")
 
@@ -81,7 +77,6 @@ home_view = View(
     name="home",
     children=[pair_view, analyze_view],
 )
-
 
 pair_view.parent = home_view
 
