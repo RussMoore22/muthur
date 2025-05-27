@@ -15,7 +15,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-METADATA_FILE = "/tmp/bluetooth_metadata.json"
+METADATA_FILE = "/home/rcmoore/muthur/bluetooth_metadata.json"
 
 current_metadata = {
     "Title": "",

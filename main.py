@@ -25,7 +25,7 @@ logging.basicConfig(
 
 def get_pairing_code():
     try:
-        with open("/tmp/bluetooth_code.json", "r") as f:
+        with open("/home/rcmoore/muthur/bluetooth_code.json", "r") as f:
             return json.load(f)
     except:
         return {"Passkey": ""}
@@ -74,7 +74,7 @@ def start_bluetooth_agent():
     
 def get_bluetooth_metadata():
     try:
-        with open("/tmp/bluetooth_metadata.json", "r") as f:
+        with open("/home/rcmoore/muthur/bluetooth_metadata.json", "r") as f:
             return json.load(f)
     except Exception as e:
         logging.warning(f"Failed to read metadata: {e}")
@@ -114,7 +114,7 @@ def disconnect_bluetooth_device():
 
     # Clear metadata file to remove stale info
     try:
-        with open("/tmp/bluetooth_metadata.json", "w") as f:
+        with open("/home/rcmoore/muthur/bluetooth_metadata.json", "w") as f:
             json.dump({
                 "Title": "",
                 "Artist": "",

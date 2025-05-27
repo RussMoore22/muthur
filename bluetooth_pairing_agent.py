@@ -29,13 +29,13 @@ class Agent(dbus.service.Object):
     @dbus.service.method("org.bluez.Agent1", in_signature="ouq", out_signature="")
     def DisplayPasskey(self, device, passkey, entered):
         logging.info("DisplayPasskey %s passkey: %06d", device, passkey)
-        with open("/tmp/bluetooth_code.json", "w") as f:
+        with open("/home/rcmoore/muthur/bluetooth_code.json", "w") as f:
             json.dump({"Passkey": f"{passkey:06d}"}, f)
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def RequestConfirmation(self, device, passkey):
         logging.info("RequestConfirmation %s code: %06d", device, int(passkey))
-        with open("/tmp/bluetooth_code.json", "w") as f:
+        with open("/home/rcmoore/muthur/bluetooth_code.json", "w") as f:
             json.dump({"Passkey": f"{int(passkey):06d}"}, f)
         return  # Auto-confirm
 
