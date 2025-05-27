@@ -4,6 +4,7 @@ import os
 import logging
 import subprocess
 import select
+import json
 
 bluetooth_agent = None
 bluetooth_log_lines = []
@@ -28,8 +29,29 @@ def start_bluetooth_agent():
     except Exception as e:
         logging.error(f"Failed to start bluetooth agent: {e}")
         return None
+    
+def get_bluetooth_metadata():
+    try:
+        with open("/tmp/bluetooth_metadata.json", "r") as f:
+            return json.load(f)
+    except Exception as e:
+        logging.warning(f"Failed to read metadata: {e}")
+        return {}
 
+def render_metadata(screen, font, start_y=50):
+    metadata = get_bluetooth_metadata()
+    y = start_y
+    for key in ["Title", "Artist", "Album"]:
+        value = metadata.get(key, "")
+        text = font.render(f"{key}: {value}", True, NEON_GREEN)
+        screen.blit(text, (420, y))
+        y += 30
 
+# at startup
+metadata_listener = subprocess.Popen(
+    ["python3", "/home/rcmoore/muthur/bluetooth_metadata_listener.py"],
+    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+)
 
 pygame.init()
 screen = pygame.display.set_mode((800, 480))
@@ -174,12 +196,13 @@ while running:
         screen.fill(BLACK)
         buttons = current_view.buttons
 
+
         # Draw the rotating Mustang
         if current_view.name == "home":
             draw_mustang(screen, center=(600, 240), angle=angle)
             angle = (angle + 5) % 360
-
-
+        if current_view == "pair":
+            render_metadata(screen, font=pygame.font.SysFont('Courier', 28, bold=True))
 
         # Draw UI buttons
         for button in buttons:
