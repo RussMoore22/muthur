@@ -3,7 +3,16 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 from gi.repository import GLib
+import json
+import logging
 
+# Configure logging
+logging.basicConfig(
+    filename="/home/rcmoore/muthur/muthur.log",
+    filemode='a',
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 AGENT_PATH = "/test/agent"
 
