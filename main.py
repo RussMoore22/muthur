@@ -54,19 +54,31 @@ def get_bluetooth_metadata():
         return {}
     
 def disconnect_bluetooth_device():
-    global bluetooth_metadata, bluetooth_agent
-    bluetooth_agent = None
+    global bluetooth_log_lines, bluetooth_agent
     bluetooth_log_lines = []
+    bluetooth_agent = None
+
     try:
-        # Get connected device MAC address via bluetoothctl
-        output = subprocess.check_output(
-            "echo 'devices Connected' | bluetoothctl | grep 'Device' | awk '{print $2}'",
-            shell=True,
-            text=True
-        ).strip()
-        if output:
-            subprocess.run(["bluetoothctl", "disconnect", output], check=True)
-            logging.info(f"Disconnected device {output}")
+        # Get MAC of connected device
+        info_output = subprocess.check_output(
+            "echo 'devices' | bluetoothctl", shell=True, text=True
+        ).splitlines()
+
+        connected_mac = None
+        for line in info_output:
+            if "Device" in line:
+                mac = line.split()[1]
+                # Check connection status
+                detail = subprocess.check_output(
+                    f"echo 'info {mac}' | bluetoothctl", shell=True, text=True
+                )
+                if "Connected: yes" in detail:
+                    connected_mac = mac
+                    break
+
+        if connected_mac:
+            subprocess.run(["bluetoothctl", "disconnect", connected_mac], check=True)
+            logging.info(f"Disconnected device {connected_mac}")
         else:
             logging.info("No connected device found to disconnect.")
     except subprocess.CalledProcessError as e:
