@@ -195,8 +195,14 @@ angle = 180
 running = True
 while running:
     try:
+        screen.fill(BLACK)
         if current_view.name == "pair_view" and bluetooth_agent:
-            output = bluetooth_agent.stdout.readline()
+            rlist, _, _ = select.select([bluetooth_agent.stdout], [], [], 0.01)
+            if rlist:
+                output = bluetooth_agent.stdout.readline()
+                if output:
+                    bluetooth_log_lines.append(output.strip())
+                    bluetooth_log_lines = bluetooth_log_lines[-10:]
             if output:
                 bluetooth_log_lines.append(output.strip())
                 bluetooth_log_lines = bluetooth_log_lines[-10:]
@@ -207,7 +213,6 @@ while running:
                 screen.blit(text, (420, y))
                 y += 30
 
-        screen.fill(BLACK)
         buttons = current_view.buttons
 
 
@@ -215,7 +220,7 @@ while running:
         if current_view.name == "home":
             draw_mustang(screen, center=(600, 240), angle=angle)
             angle = (angle + 5) % 360
-        if current_view == "pair":
+        if current_view.name == "pair_view":
             render_metadata(screen, font=pygame.font.SysFont('Courier', 28, bold=True))
 
         # Draw UI buttons
