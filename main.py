@@ -52,8 +52,38 @@ def get_bluetooth_metadata():
     except Exception as e:
         logging.warning(f"Failed to read metadata: {e}")
         return {}
+    
+def disconnect_bluetooth_device():
+    try:
+        # Get connected device MAC address via bluetoothctl
+        output = subprocess.check_output(
+            "echo 'devices Connected' | bluetoothctl | grep 'Device' | awk '{print $2}'",
+            shell=True,
+            text=True
+        ).strip()
+        if output:
+            subprocess.run(["bluetoothctl", "disconnect", output], check=True)
+            logging.info(f"Disconnected device {output}")
+        else:
+            logging.info("No connected device found to disconnect.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to disconnect device: {e}")
 
-def render_metadata(screen, font, start_y=50):
+    # Clear metadata file to remove stale info
+    try:
+        with open("/tmp/bluetooth_metadata.json", "w") as f:
+            json.dump({
+                "Title": "",
+                "Artist": "",
+                "Album": "",
+                "Genre": "",
+                "Duration": ""
+            }, f)
+        logging.info("Cleared Bluetooth metadata cache")
+    except Exception as e:
+        logging.error(f"Failed to clear metadata cache: {e}")
+
+def render_metadata(screen, font, start_y=300):
     metadata = get_bluetooth_metadata()
     y = start_y
     for key in ["Title", "Artist", "Album"]:
@@ -61,7 +91,6 @@ def render_metadata(screen, font, start_y=50):
         text = font.render(f"{key}: {value}", True, NEON_GREEN)
         screen.blit(text, (420, y))
         y += 30
-
 
 
 pygame.init()
@@ -106,13 +135,16 @@ class View:
         for child in self.children:
             if child.name == name:
                 return child
+def no_action():
+    logging.info("this button has no action")
             
 # Button class
 class Button:
-    def __init__(self, x, y, w, h, label, redirect: View):
+    def __init__(self, x, y, w, h, label, redirect: View, action=no_action):
         self.rect = pygame.Rect(x, y, w, h)
         self.label = label
         self.redirect = redirect
+        self.action = action
 
     def draw(self, surface):
         pygame.draw.rect(surface, DARK_GREEN, self.rect, border_radius=5)
@@ -124,11 +156,10 @@ class Button:
         return self.rect.collidepoint(pos)
     
     def change_view(self, current_view):
-        if self.label == "SELF DESTRUCT":
-            pygame.quit()
+        self.action()
         return self.redirect
-        
 
+        
 # create views:
 pair_view = View(name="pair_view")
 analyze_view = View(name="analyze_view")
@@ -150,7 +181,8 @@ pair_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view)
 ]
 analyze_view.buttons = [
-    Button(50, 100, 250, 60, "ESCAPE", home_view)
+    Button(50, 100, 250, 60, "ESCAPE", home_view),
+    Button(50, 180, 250, 60, "REMOVE PARASITE", home_view, disconnect_bluetooth_device)
 ]
 
 
@@ -206,7 +238,7 @@ try:
             y = 50
             for line in bluetooth_log_lines:
                 text = font.render(line, True, NEON_GREEN)
-                screen.blit(text, (420, y))
+                screen.blit(text, (20, y))
                 y += 30
 
         buttons = current_view.buttons
