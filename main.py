@@ -3,6 +3,7 @@ import math
 import os
 import logging
 import subprocess
+import select
 
 bluetooth_agent = None
 bluetooth_log_lines = []
@@ -155,10 +156,12 @@ while running:
         # Read output from bluetooth agent process
         if current_view.name == "pair_view" and bluetooth_agent:
             logging.info("will attempt to print bluetooth log to display")
-            output = bluetooth_agent.stdout.readline()
-            if output:
-                bluetooth_log_lines.append(output.strip())
-                bluetooth_log_lines = bluetooth_log_lines[-10:]  # Limit to last 10 lines
+            ready, _, _ = select.select([bluetooth_agent.stdout], [], [], 0)
+            if ready:
+                output = bluetooth_agent.stdout.readline()
+                if output:
+                    bluetooth_log_lines.append(output.strip())
+                    bluetooth_log_lines = bluetooth_log_lines[-10:]  # Limit to last 10 lines
 
             # Draw logs on right half
             y = 50

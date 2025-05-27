@@ -15,31 +15,31 @@ class Agent(dbus.service.Object):
 
     @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="s")
     def RequestPinCode(self, device):
-        print(f"RequestPinCode for device {device}")
+        print(f"RequestPinCode for device {device}", flush=True)
         return "0000"
 
     @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="u")
     def RequestPasskey(self, device):
-        print(f"RequestPasskey for device {device}")
+        print(f"RequestPasskey for device {device}", flush=True)
         return dbus.UInt32(123456)
 
     @dbus.service.method("org.bluez.Agent1", in_signature="ou", out_signature="")
     def DisplayPasskey(self, device, passkey):
-        print(f"DisplayPasskey {device} {passkey}")
+        print(f"DisplayPasskey {device} {passkey}", flush=True)
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def AuthorizeService(self, device, uuid):
-        print(f"AuthorizeService {device} {uuid}")
+        print(f"AuthorizeService {device} {uuid}", flush=True)
         return
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def RequestConfirmation(self, device, passkey):
-        print(f"Confirming passkey {passkey} for {device}")
+        print(f"Confirming passkey {passkey} for {device}", flush=True)
         return
 
     @dbus.service.method("org.bluez.Agent1", in_signature="", out_signature="")
     def Cancel(self):
-        print("Pairing cancelled")
+        print("Pairing cancelled", flush=True)
 
 def setup_bluetooth():
     bus = dbus.SystemBus()
