@@ -202,9 +202,6 @@ try:
                 if output:
                     bluetooth_log_lines.append(output.strip())
                     bluetooth_log_lines = bluetooth_log_lines[-10:]
-            if output:
-                bluetooth_log_lines.append(output.strip())
-                bluetooth_log_lines = bluetooth_log_lines[-10:]
 
             y = 50
             for line in bluetooth_log_lines:
