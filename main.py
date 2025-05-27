@@ -54,6 +54,9 @@ def get_bluetooth_metadata():
         return {}
     
 def disconnect_bluetooth_device():
+    global bluetooth_metadata, bluetooth_agent
+    bluetooth_agent = None
+    bluetooth_log_lines = []
     try:
         # Get connected device MAC address via bluetoothctl
         output = subprocess.check_output(
