@@ -16,19 +16,22 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+
 def enable_bluetooth_mode():
     commands = [
-        'bluetoothctl discoverable on',
-        'bluetoothctl pairable on',
-        'bluetoothctl agent on',
-        'bluetoothctl default-agent'
+        ['bluetoothctl', 'discoverable', 'on'],
+        ['bluetoothctl', 'pairable', 'on'],
+        ['bluetoothctl', 'agent', 'NoInputNoOutput'],
+        ['bluetoothctl', 'default-agent']
     ]
     for cmd in commands:
         try:
-            subprocess.run(cmd.split(), check=True)
-            logging.info(f"Ran: {cmd}")
+            subprocess.run(cmd, check=True)
+            logging.info(f"Ran: {' '.join(cmd)}")
         except subprocess.CalledProcessError as e:
-            logging.error(f"Failed: {cmd} with error: {e}")
+            logging.error(f"Failed: {' '.join(cmd)} with error: {e}")
+
 
 def start_bluetooth_agent():
     try:
