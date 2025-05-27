@@ -193,9 +193,8 @@ current_view = home_view
 
 angle = 180
 running = True
-while running:
-    try:
-        screen.fill(BLACK)
+try:
+    while running:
         if current_view.name == "pair_view" and bluetooth_agent:
             rlist, _, _ = select.select([bluetooth_agent.stdout], [], [], 0.01)
             if rlist:
@@ -214,7 +213,7 @@ while running:
                 y += 30
 
         buttons = current_view.buttons
-
+        screen.fill(BLACK)
 
         # Draw the rotating Mustang
         if current_view.name == "home":
@@ -241,8 +240,8 @@ while running:
 
         pygame.display.update()
         clock.tick(60)
-    except Exception as e:
-        logging.exception(f"Unhandled exception in main loop: {e}")
-        pygame.quit()
+except Exception as e:
+    logging.exception(f"Unhandled exception in main loop: {e}")
+    pygame.quit()
 
 pygame.quit()
