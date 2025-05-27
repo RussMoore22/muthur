@@ -4,6 +4,15 @@ import dbus.mainloop.glib
 import dbus.service
 import os
 from gi.repository import GLib
+import logging
+
+# Configure logging
+logging.basicConfig(
+    filename="/home/rcmoore/muthur/bluetooth.log",
+    filemode='a',
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 AGENT_PATH = "/test/agent"
 DEVICE_INTERFACE = "org.bluez.Device1"
@@ -11,35 +20,35 @@ DEVICE_INTERFACE = "org.bluez.Device1"
 class Agent(dbus.service.Object):
     @dbus.service.method("org.bluez.Agent1", in_signature="", out_signature="")
     def Release(self):
-        print("Agent released")
+        logging.info("Agent released")
 
     @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="s")
     def RequestPinCode(self, device):
-        print(f"RequestPinCode for device {device}", flush=True)
+        logging.info(f"RequestPinCode for device {device}", flush=True)
         return "0000"
 
     @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="u")
     def RequestPasskey(self, device):
-        print(f"RequestPasskey for device {device}", flush=True)
+        logging.info(f"RequestPasskey for device {device}", flush=True)
         return dbus.UInt32(123456)
 
     @dbus.service.method("org.bluez.Agent1", in_signature="ou", out_signature="")
     def DisplayPasskey(self, device, passkey):
-        print(f"DisplayPasskey {device} {passkey}", flush=True)
+        logging.info(f"DisplayPasskey {device} {passkey}", flush=True)
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def AuthorizeService(self, device, uuid):
-        print(f"AuthorizeService {device} {uuid}", flush=True)
+        logging.info(f"AuthorizeService {device} {uuid}", flush=True)
         return
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def RequestConfirmation(self, device, passkey):
-        print(f"Confirming passkey {passkey} for {device}", flush=True)
+        logging.info(f"Confirming passkey {passkey} for {device}", flush=True)
         return
 
     @dbus.service.method("org.bluez.Agent1", in_signature="", out_signature="")
     def Cancel(self):
-        print("Pairing cancelled", flush=True)
+        logging.info("Pairing cancelled", flush=True)
 
 def setup_bluetooth():
     bus = dbus.SystemBus()
