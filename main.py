@@ -89,7 +89,7 @@ def render_metadata(screen, font, start_y=300):
     for key in ["Title", "Artist", "Album"]:
         value = metadata.get(key, "")
         text = font.render(f"{key}: {value}", True, NEON_GREEN)
-        screen.blit(text, (420, y))
+        screen.blit(text, (20, y))
         y += 30
 
 
@@ -178,11 +178,11 @@ home_view.buttons = [
     ]
 
 pair_view.buttons = [
-    Button(50, 100, 250, 60, "ESCAPE", home_view)
+    Button(50, 100, 250, 60, "ESCAPE", home_view),
+    Button(50, 180, 250, 60, "REMOVE PARASITE", home_view, disconnect_bluetooth_device)
 ]
 analyze_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view),
-    Button(50, 180, 250, 60, "REMOVE PARASITE", home_view, disconnect_bluetooth_device)
 ]
 
 
