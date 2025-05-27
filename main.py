@@ -16,6 +16,15 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+def get_pairing_code():
+    try:
+        with open("/tmp/bluetooth_code.json", "r") as f:
+            return json.load(f)
+    except:
+        return {"Passkey": ""}
+    
+
 def is_device_connected():
     try:
         output = subprocess.check_output("echo 'devices' | bluetoothctl", shell=True, text=True).splitlines()
@@ -65,6 +74,7 @@ def get_bluetooth_metadata():
         logging.warning(f"Failed to read metadata: {e}")
         return {}
     
+    
 def disconnect_bluetooth_device():
     global bluetooth_log_lines, bluetooth_agent
     bluetooth_log_lines = []
@@ -111,21 +121,21 @@ def disconnect_bluetooth_device():
         logging.error(f"Failed to clear metadata cache: {e}")
 
 def render_metadata(screen, font, start_y=300):
+    metadata = get_bluetooth_metadata()
+    y = start_y
+    for key in ["Title", "Artist", "Album"]:
+        value = metadata.get(key, "")
+        text = font.render(f"{key}: {value}", True, NEON_GREEN)
+        screen.blit(text, (20, y))
+        y += 30
+
     if not is_device_connected():
-        try:
-            # Clear cache file if still has stale info
-            with open("/tmp/bluetooth_metadata.json", "w") as f:
-                json.dump({
-                    "Title": "",
-                    "Artist": "",
-                    "Album": "",
-                    "Genre": "",
-                    "Duration": ""
-                }, f)
-            logging.info("Cleared metadata cache due to no connected device")
-        except Exception as e:
-            logging.error(f"Failed to clear metadata cache: {e}")
-        return  # Don't draw anything
+        pairing = get_pairing_code()
+        code = pairing.get("Passkey", "")
+        if code:
+            text = font.render(f"Pairing Code: {code}", True, NEON_GREEN)
+            screen.blit(text, (20, y))
+
 
     metadata = get_bluetooth_metadata()
     y = start_y

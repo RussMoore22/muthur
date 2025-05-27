@@ -4,6 +4,7 @@ import dbus.service
 import dbus.mainloop.glib
 from gi.repository import GLib
 
+
 AGENT_PATH = "/test/agent"
 
 class Agent(dbus.service.Object):
@@ -16,14 +17,18 @@ class Agent(dbus.service.Object):
         print(f"RequestPinCode for device {device}")
         return "0000"
 
-    @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="u")
-    def RequestPasskey(self, device):
-        print(f"RequestPasskey for device {device}")
-        return dbus.UInt32(123456)
+    @dbus.service.method("org.bluez.Agent1", in_signature="ouq", out_signature="")
+    def DisplayPasskey(self, device, passkey, entered):
+        logging.info("DisplayPasskey %s passkey: %06d", device, passkey)
+        with open("/tmp/bluetooth_code.json", "w") as f:
+            json.dump({"Passkey": f"{passkey:06d}"}, f)
 
-    @dbus.service.method("org.bluez.Agent1", in_signature="ou", out_signature="")
-    def DisplayPasskey(self, device, passkey):
-        print(f"DisplayPasskey: {passkey} for {device}")
+    @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
+    def RequestConfirmation(self, device, passkey):
+        logging.info("RequestConfirmation %s code: %06d", device, int(passkey))
+        with open("/tmp/bluetooth_code.json", "w") as f:
+            json.dump({"Passkey": f"{int(passkey):06d}"}, f)
+        return  # Auto-confirm
 
     @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def AuthorizeService(self, device, uuid):
