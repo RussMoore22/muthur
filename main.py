@@ -114,14 +114,8 @@ def disconnect_bluetooth_device():
 
     # Clear metadata file to remove stale info
     try:
-        with open("/home/rcmoore/muthur/bluetooth_metadata.json", "w") as f:
-            json.dump({
-                "Title": "",
-                "Artist": "",
-                "Album": "",
-                "Genre": "",
-                "Duration": ""
-            }, f)
+        os.remove("/home/rcmoore/muthur/bluetooth_metadata.json")
+        os.remove("/home/rcmoore/muthur/bluetooth_code.json")
         logging.info("Cleared Bluetooth metadata cache")
     except Exception as e:
         logging.error(f"Failed to clear metadata cache: {e}")
