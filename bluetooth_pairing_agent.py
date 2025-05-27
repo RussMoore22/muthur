@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import dbus
 import dbus.mainloop.glib
+import dbus.service
 import os
 from gi.repository import GLib
 
@@ -26,12 +27,12 @@ class Agent(dbus.service.Object):
     def DisplayPasskey(self, device, passkey):
         print(f"DisplayPasskey {device} {passkey}")
 
-    @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="")
+    @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def AuthorizeService(self, device, uuid):
         print(f"AuthorizeService {device} {uuid}")
         return
 
-    @dbus.service.method("org.bluez.Agent1", in_signature="o", out_signature="")
+    @dbus.service.method("org.bluez.Agent1", in_signature="os", out_signature="")
     def RequestConfirmation(self, device, passkey):
         print(f"Confirming passkey {passkey} for {device}")
         return
@@ -44,7 +45,12 @@ def setup_bluetooth():
     bus = dbus.SystemBus()
     manager = dbus.Interface(bus.get_object("org.bluez", "/org/bluez"), "org.bluez.AgentManager1")
     adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci0"), "org.freedesktop.DBus.Properties")
+
+    # Ensure adapter is discoverable, powered, and pairable
     adapter.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
+    adapter.Set("org.bluez.Adapter1", "DiscoverableTimeout", dbus.UInt32(0))
+    adapter.Set("org.bluez.Adapter1", "Discoverable", dbus.Boolean(1))
+    adapter.Set("org.bluez.Adapter1", "Pairable", dbus.Boolean(1))
 
     agent = Agent(bus, AGENT_PATH)
     manager.RegisterAgent(AGENT_PATH, "NoInputNoOutput")
