@@ -85,6 +85,14 @@ def disconnect_bluetooth_device():
     global bluetooth_log_lines, bluetooth_agent
     bluetooth_log_lines = []
     bluetooth_agent = None
+        # Clear metadata file to remove stale info
+    try:
+        os.remove("/home/rcmoore/muthur/bluetooth_metadata.json")
+        os.remove("/home/rcmoore/muthur/bluetooth_code.json")
+        logging.info("Cleared Bluetooth metadata cache")
+    except Exception as e:
+        logging.error(f"Failed to clear metadata cache: {e}")
+
 
     try:
         # Get MAC of connected device
@@ -112,13 +120,6 @@ def disconnect_bluetooth_device():
     except subprocess.CalledProcessError as e:
         logging.error(f"Failed to disconnect device: {e}")
 
-    # Clear metadata file to remove stale info
-    try:
-        os.remove("/home/rcmoore/muthur/bluetooth_metadata.json")
-        os.remove("/home/rcmoore/muthur/bluetooth_code.json")
-        logging.info("Cleared Bluetooth metadata cache")
-    except Exception as e:
-        logging.error(f"Failed to clear metadata cache: {e}")
 
 def render_metadata(screen, font, start_y=300):
     metadata = get_bluetooth_metadata()
@@ -129,7 +130,7 @@ def render_metadata(screen, font, start_y=300):
         screen.blit(text, (20, y))
         y += 30
 
-    if not is_device_connected():
+    if is_device_connected():
         pairing = get_pairing_code()
         code = pairing.get("Passkey", "")
         if code:
@@ -233,7 +234,7 @@ home_view.buttons = [
 
 pair_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view),
-    Button(50, 180, 250, 60, "REMOVE PARASITE", home_view, disconnect_bluetooth_device)
+    Button(50, 180, 250, 60, "REMOVE PARASITE", pair_view, disconnect_bluetooth_device)
 ]
 analyze_view.buttons = [
     Button(50, 100, 250, 60, "ESCAPE", home_view),
