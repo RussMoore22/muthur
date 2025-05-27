@@ -140,7 +140,7 @@ def render_metadata(screen, font, start_y=300):
         code = pairing.get("Passkey", "")
         if code:
             text = font.render(f"Pairing Code: {code}", True, NEON_GREEN)
-            screen.blit(text, (20, y))
+            screen.blit(text, (400, y))
 
 
     metadata = get_bluetooth_metadata()
@@ -310,6 +310,7 @@ try:
             angle = (angle + 5) % 360
         if current_view.name == "pair_view":
             render_metadata(screen, font=pygame.font.SysFont('Courier', 28, bold=True))
+
 
         # Draw UI buttons
         for button in buttons:
