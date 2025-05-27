@@ -16,18 +16,30 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
+def enable_bluetooth_mode():
+    commands = [
+        'bluetoothctl discoverable on',
+        'bluetoothctl pairable on',
+        'bluetoothctl agent on',
+        'bluetoothctl default-agent'
+    ]
+    for cmd in commands:
+        try:
+            subprocess.run(cmd.split(), check=True)
+            logging.info(f"Ran: {cmd}")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed: {cmd} with error: {e}")
 
 def start_bluetooth_agent():
     try:
-        process = subprocess.Popen(
+        return subprocess.Popen(
             ["python3", "/home/rcmoore/muthur/bluetooth_pairing_agent.py"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True
         )
-        return process
     except Exception as e:
-        logging.error(f"Failed to start bluetooth agent: {e}")
+        logging.error(f"Bluetooth agent start failed: {e}")
         return None
     
 def get_bluetooth_metadata():
@@ -47,13 +59,16 @@ def render_metadata(screen, font, start_y=50):
         screen.blit(text, (420, y))
         y += 30
 
+
+
+pygame.init()
+enable_bluetooth_mode()
 # at startup
 metadata_listener = subprocess.Popen(
     ["python3", "/home/rcmoore/muthur/bluetooth_metadata_listener.py"],
     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
 )
 
-pygame.init()
 screen = pygame.display.set_mode((800, 480))
 pygame.display.set_caption("MUTHUR - Foxbody Display")
 pygame.mouse.set_visible(True)
@@ -177,21 +192,17 @@ angle = 180
 running = True
 while running:
     try:
-        # # Read output from bluetooth agent process
-        # if current_view.name == "pair_view" and bluetooth_agent:
-        #     ready, _, _ = select.select([bluetooth_agent.stdout], [], [], 0)
-        #     if ready:
-        #         output = bluetooth_agent.stdout.readline()
-        #         if output:
-        #             bluetooth_log_lines.append(output.strip())
-        #             bluetooth_log_lines = bluetooth_log_lines[-10:]  # Limit to last 10 lines
+        if current_view.name == "pair_view" and bluetooth_agent:
+            output = bluetooth_agent.stdout.readline()
+            if output:
+                bluetooth_log_lines.append(output.strip())
+                bluetooth_log_lines = bluetooth_log_lines[-10:]
 
-        #     # Draw logs on right half
-        #     y = 50
-        #     for line in bluetooth_log_lines:
-        #         text = font.render(line, True, NEON_GREEN)
-        #         screen.blit(text, (420, y))
-        #         y += 32
+            y = 50
+            for line in bluetooth_log_lines:
+                text = font.render(line, True, NEON_GREEN)
+                screen.blit(text, (420, y))
+                y += 30
 
         screen.fill(BLACK)
         buttons = current_view.buttons
