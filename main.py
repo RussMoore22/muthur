@@ -2,6 +2,23 @@ import pygame
 import math
 import os
 import logging
+import subprocess
+
+bluetooth_agent = None
+bluetooth_log_lines = []
+
+def start_bluetooth_agent():
+    try:
+        process = subprocess.Popen(
+            ["python3", "/home/rcmoore/muthur/bluetooth_pairing_agent.py"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+        return process
+    except Exception as e:
+        logging.error(f"Failed to start bluetooth agent: {e}")
+        return None
 
 # Configure logging
 logging.basicConfig(
@@ -134,6 +151,20 @@ current_view = home_view
 angle = 180
 running = True
 while running:
+    # Read output from bluetooth agent process
+    if current_view.name == "pair_view" and bluetooth_agent:
+        output = bluetooth_agent.stdout.readline()
+        if output:
+            bluetooth_log_lines.append(output.strip())
+            bluetooth_log_lines = bluetooth_log_lines[-10:]  # Limit to last 10 lines
+
+        # Draw logs on right half
+        y = 50
+        for line in bluetooth_log_lines:
+            text = font.render(line, True, NEON_GREEN)
+            screen.blit(text, (420, y))
+            y += 32
+
     screen.fill(BLACK)
     buttons = current_view.buttons
 
@@ -141,6 +172,8 @@ while running:
     if current_view.name == "home":
         draw_mustang(screen, center=(600, 240), angle=angle)
         angle = (angle + 5) % 360
+
+
 
     # Draw UI buttons
     for button in buttons:
@@ -155,6 +188,8 @@ while running:
                 if button.is_pressed(pos):
                     logging.info(f"{button.label} button pressed")
                     current_view = button.redirect
+                    if current_view.name == "pair_view" and bluetooth_agent in None:
+                        bluetooth_agent = start_bluetooth_agent()
 
     pygame.display.update()
     clock.tick(60)
