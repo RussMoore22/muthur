@@ -122,20 +122,21 @@ def disconnect_bluetooth_device():
 
 
 def render_metadata(screen, font, start_y=300):
-    metadata = get_bluetooth_metadata()
-    y = start_y
-    for key in ["Title", "Artist", "Album"]:
-        value = metadata.get(key, "")
-        text = font.render(f"{key}: {value}", True, NEON_GREEN)
-        screen.blit(text, (20, y))
-        y += 30
 
     if is_device_connected():
+        metadata = get_bluetooth_metadata()
+        y = start_y
+        for key in ["Title", "Artist", "Album"]:
+            value = metadata.get(key, "")
+            text = font.render(f"{key}: {value}", True, NEON_GREEN)
+            screen.blit(text, (20, y))
+            y += 30
+            
         pairing = get_pairing_code()
         code = pairing.get("Passkey", "")
         if code:
             text = font.render(f"Pairing Code: {code}", True, NEON_GREEN)
-            screen.blit(text, (400, y))
+            screen.blit(text, (400, 10))
 
 
     metadata = get_bluetooth_metadata()
