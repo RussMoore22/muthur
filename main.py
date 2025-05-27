@@ -16,7 +16,19 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
-
+def is_device_connected():
+    try:
+        output = subprocess.check_output("echo 'devices' | bluetoothctl", shell=True, text=True).splitlines()
+        for line in output:
+            if "Device" in line:
+                mac = line.split()[1]
+                detail = subprocess.check_output(f"echo 'info {mac}' | bluetoothctl", shell=True, text=True)
+                if "Connected: yes" in detail:
+                    return True
+        return False
+    except Exception as e:
+        logging.warning(f"Failed to check connection status: {e}")
+        return False
 
 def enable_bluetooth_mode():
     commands = [
@@ -99,6 +111,22 @@ def disconnect_bluetooth_device():
         logging.error(f"Failed to clear metadata cache: {e}")
 
 def render_metadata(screen, font, start_y=300):
+    if not is_device_connected():
+        try:
+            # Clear cache file if still has stale info
+            with open("/tmp/bluetooth_metadata.json", "w") as f:
+                json.dump({
+                    "Title": "",
+                    "Artist": "",
+                    "Album": "",
+                    "Genre": "",
+                    "Duration": ""
+                }, f)
+            logging.info("Cleared metadata cache due to no connected device")
+        except Exception as e:
+            logging.error(f"Failed to clear metadata cache: {e}")
+        return  # Don't draw anything
+
     metadata = get_bluetooth_metadata()
     y = start_y
     for key in ["Title", "Artist", "Album"]:
