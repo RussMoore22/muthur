@@ -139,15 +139,6 @@ def render_metadata(screen, font, start_y=300):
             screen.blit(text, (400, 10))
 
 
-    metadata = get_bluetooth_metadata()
-    y = start_y
-    for key in ["Title", "Artist", "Album"]:
-        value = metadata.get(key, "")
-        text = font.render(f"{key}: {value}", True, NEON_GREEN)
-        screen.blit(text, (20, y))
-        y += 30
-
-
 pygame.init()
 enable_bluetooth_mode()
 # at startup
