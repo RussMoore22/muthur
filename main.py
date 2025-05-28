@@ -201,7 +201,7 @@ class Button:
     def is_pressed(self, pos):
         return self.rect.collidepoint(pos)
     
-    def change_view(self, current_view):
+    def change_view(self):
         self.action()
         return self.redirect
 
@@ -311,7 +311,7 @@ try:
                 for button in buttons:
                     if button.is_pressed(pos):
                         logging.info(f"{button.label} button pressed")
-                        current_view = button.redirect
+                        current_view = button.change_view()
                         if current_view.name == "pair_view" and bluetooth_agent is None:
                             bluetooth_agent = start_bluetooth_agent()
 
