@@ -126,17 +126,20 @@ def render_metadata(screen, font, start_y=300):
     if is_device_connected():
         metadata = get_bluetooth_metadata()
         y = start_y
+        concat_value_string = ""
         for key in ["Title", "Artist", "Album"]:
             value = metadata.get(key, "")
+            concat_value_string += value
             text = font.render(f"{key}: {value}", True, NEON_GREEN)
             screen.blit(text, (20, y))
             y += 30
-            
-        pairing = get_pairing_code()
-        code = pairing.get("Passkey", "")
-        if code:
-            text = font.render(f"Pairing Code: {code}", True, NEON_GREEN)
-            screen.blit(text, (400, 10))
+        if len(concat_value_string) < 1:
+                
+            pairing = get_pairing_code()
+            code = pairing.get("Passkey", "")
+            if code:
+                text = font.render(f"Pairing Code: {code}", True, NEON_GREEN)
+                screen.blit(text, (400, 10))
 
 
 pygame.init()
