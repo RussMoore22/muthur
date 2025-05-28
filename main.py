@@ -157,7 +157,7 @@ BLACK = (0, 0, 0)
 NEON_GREEN = (0, 255, 0)
 DARK_GREEN = (0, 100, 0)
 
-font = pygame.font.SysFont('Courier', 28, bold=True)
+font = pygame.font.SysFont('Courier', 20, bold=True)
 
 
 class View:
