@@ -297,7 +297,7 @@ try:
         # Draw the rotating Mustang
         if current_view.name == "home":
             draw_mustang(screen, center=(600, 240), angle=angle)
-            angle = (angle + 45) % 360
+            angle = (angle + 15) % 360
         if current_view.name == "pair_view":
             render_metadata(screen, font=pygame.font.SysFont('Courier', 28, bold=True))
 
@@ -319,7 +319,7 @@ try:
                             bluetooth_agent = start_bluetooth_agent()
 
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(20)
 except Exception as e:
     logging.exception(f"Unhandled exception in main loop: {e}")
     pygame.quit()
